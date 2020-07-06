@@ -12,7 +12,11 @@ import {Text} from '../components';
 import {screenNames} from '../configs/const';
 
 const HomeScreen = () => {
-  return <View />;
+  return (
+    <View>
+      <Text>Home</Text>
+    </View>
+  );
 };
 
 export default HomeScreen;
