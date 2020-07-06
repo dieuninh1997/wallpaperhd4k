@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "707034648091",
+    "firebase_url": "https://wallpaperhd4k-68132.firebaseio.com",
+    "project_id": "wallpaperhd4k-68132",
+    "storage_bucket": "wallpaperhd4k-68132.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:707034648091:android:dbf368fd752375335df2be",
+        "android_client_info": {
+          "package_name": "com.ttdn.wallpaperhd4k"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "707034648091-v1hs36pq5vj1o4f6o8dp3v6a7i60361n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATk62Fg2vOUiMkSZYtXsNeFSg278PcJ3o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "707034648091-v1hs36pq5vj1o4f6o8dp3v6a7i60361n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
