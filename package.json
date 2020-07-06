@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@react-native-community/async-storage": "1.6.2",
-    "@react-native-firebase/app": "^6.0.4",
-    "@react-native-firebase/firestore": "^6.0.4",
+    "@react-native-firebase/app": "^8.0.1",
+    "@react-native-firebase/firestore": "^7.2.4",
     "axios": "^0.19.2",
     "react": "16.11.0",
     "react-native": "0.62.2",
