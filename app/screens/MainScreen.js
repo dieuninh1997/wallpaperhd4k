@@ -1,5 +1,11 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {View, StyleSheet, FlatList, ActivityIndicator} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  Dimensions,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import SplashScreen from 'react-native-splash-screen';
 import Drawer from 'react-native-drawer';
@@ -8,6 +14,11 @@ import {Text} from '../components';
 import Header from '../components/Header';
 import axios from '../configs/axios';
 import FastImage from 'react-native-fast-image';
+import AppConfig from '../utils/AppConfig';
+import {useNavigation} from 'react-navigation-hooks';
+import {screenNames} from '../configs/const';
+
+const {width} = Dimensions.get('window');
 
 const MainScreen = () => {
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
@@ -16,6 +27,8 @@ const MainScreen = () => {
   const [listImage, setListImage] = useState([]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [nextPage, setNextPage] = useState(1);
+  const [perPage, setPerPage] = useState(1);
+  const {navigate} = useNavigation();
 
   useEffect(() => {
     SplashScreen.hide();
@@ -23,31 +36,42 @@ const MainScreen = () => {
     const asyncLoadData = async () => {
       await getImages();
     };
+    asyncLoadData();
   }, [getImages]);
 
   const getImages = useCallback(async () => {
     setIsLoadingMore(true);
     try {
-      const response = await axios.get(`/popular?per_page=80&page=${nextPage}`);
-      console.log('================================================');
-      console.log('response', response);
-      console.log('================================================');
+      const response = await axios.get(
+        `/popular?per_page=80&page=${nextPage}`,
+        {
+          headers: {
+            Authorization: AppConfig.API_ACCESS_KEY,
+          },
+        },
+      );
       setListImage([...listImage, ...response.data.photos]);
-      setNextPage(nextPage + 1);
+      setPerPage(response.data.per_page);
+      if (nextPage + 1 <= perPage) {
+        setNextPage(nextPage + 1);
+      } else {
+        setNextPage(1);
+      }
       setIsLoadingMore(false);
     } catch (error) {
       setIsLoadingMore(false);
       console.log('getImages.error', error);
     }
-  }, [listImage, nextPage]);
+  }, [listImage, nextPage, perPage]);
 
   const handleRefreshData = async () => {
     setIsRefreshing(true);
     try {
-      const response = await axios.get('/popular?per_page=80&page=1');
-      console.log('================================================');
-      console.log('handleRefreshData', response);
-      console.log('================================================');
+      const response = await axios.get('/popular?per_page=80&page=1', {
+        headers: {
+          Authorization: AppConfig.API_ACCESS_KEY,
+        },
+      });
       setListImage(response.data.photos);
       setNextPage(1);
       setIsRefreshing(false);
@@ -57,7 +81,9 @@ const MainScreen = () => {
     }
   };
 
-  const handleGoImageDetailScreen = image => {};
+  const handleGoImageDetailScreen = image => {
+    navigate({routeName: screenNames.ImageDetailScreen, params: {image}});
+  };
 
   const handleCloseDrawer = () => {
     setIsOpenDrawer(false);
@@ -85,7 +111,7 @@ const MainScreen = () => {
   const renderHeader = () => {
     return (
       <Header
-        showStatusBar={false}
+        showStatusBar={true}
         left={renderLeftHeader()}
         center={renderCenterHeader()}
       />
@@ -104,9 +130,7 @@ const MainScreen = () => {
     if (!isLoadingMore) {
       return null;
     }
-    return (
-      <ActivityIndicator style={{color: '#000', height: (50 / 375) * width}} />
-    );
+    return <ActivityIndicator style={styles.indicator} />;
   };
 
   return (
@@ -131,7 +155,7 @@ const MainScreen = () => {
             <Text
               style={[
                 styles.label,
-                screenNavigate === 'HomeScreen' ? {fontWeight: 'bold'} : null,
+                screenNavigate === 'HomeScreen' ? styles.textBold : null,
               ]}>
               Trending
             </Text>
@@ -141,9 +165,7 @@ const MainScreen = () => {
             <Text
               style={[
                 styles.label,
-                screenNavigate === 'TrendingScreen'
-                  ? {fontWeight: 'bold'}
-                  : null,
+                screenNavigate === 'TrendingScreen' ? styles.textBold : null,
               ]}>
               Newest
             </Text>
@@ -166,7 +188,7 @@ const MainScreen = () => {
           renderItem={({item, index}) => (
             <TouchableOpacity
               onPress={() => handleGoImageDetailScreen(item)}
-              style={{flex: 1}}
+              style={styles.flexOne}
               activeOpacity={0.9}>
               <FastImage
                 source={{uri: item?.src?.portrait}}
@@ -188,6 +210,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#161952',
   },
+  flexOne: {
+    flex: 1,
+  },
   buttonClose: {
     alignItems: 'flex-end',
     paddingRight: 20,
@@ -207,5 +232,12 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  textBold: {
+    fontWeight: 'bold',
+  },
+  indicator: {
+    color: '#000',
+    height: (50 / 375) * width,
   },
 });

@@ -1,11 +1,11 @@
 const screenNames = {
   HomeScreen: 'HomeScreen',
   MainScreen: 'MainScreen',
-  // ImageDetailScreen: 'ImageDetailScreen',
-  // TrendingScreen: 'TrendingScreen',
-  // CategoryScreen: 'CategoryScreen',
+  ImageDetailScreen: 'ImageDetailScreen',
+  TrendingScreen: 'TrendingScreen',
+  CategoryScreen: 'CategoryScreen',
   SplashScreen: 'SplashScreen',
-  // CollectionScreen: 'CollectionScreen',
+  CollectionScreen: 'CollectionScreen',
 };
 const Colors = {
   black: '#222831',
