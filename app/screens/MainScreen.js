@@ -7,6 +7,7 @@ import {
   Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Fontisto from 'react-native-vector-icons/Fontisto';
 import SplashScreen from 'react-native-splash-screen';
 import Drawer from 'react-native-drawer';
 import {TouchableOpacity} from 'react-native-gesture-handler';
@@ -108,12 +109,30 @@ const MainScreen = () => {
 
   const renderCenterHeader = () => <Text>Trending</Text>;
 
+  const renderRightHeader = () => (
+    <TouchableOpacity
+      hitSlop={{
+        top: 20,
+        bottom: 20,
+        left: 20,
+        right: 20,
+      }}
+      onPress={handleSearchPressed}>
+      <Fontisto size={20} color="#fff" name="search" />
+    </TouchableOpacity>
+  );
+
+  const handleSearchPressed = () => {
+    navigate({routeName: screenNames.CollectionScreen, params: {}});
+  };
+
   const renderHeader = () => {
     return (
       <Header
         showStatusBar={true}
         left={renderLeftHeader()}
         center={renderCenterHeader()}
+        right={renderRightHeader()}
       />
     );
   };
@@ -124,6 +143,10 @@ const MainScreen = () => {
 
   const handleNewestPressed = () => {
     setScreenNavigate('TrendingScreen');
+  };
+
+  const handleFavoritePressed = () => {
+    setScreenNavigate('FavoriteScreen');
   };
 
   const renderFooter = () => {
@@ -168,6 +191,16 @@ const MainScreen = () => {
                 screenNavigate === 'TrendingScreen' ? styles.textBold : null,
               ]}>
               Newest
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.row} onPress={handleFavoritePressed}>
+            <Icon size={30} color="#161952" name="heart-box-outline" />
+            <Text
+              style={[
+                styles.label,
+                screenNavigate === 'FavoriteScreen' ? styles.textBold : null,
+              ]}>
+              Favorite
             </Text>
           </TouchableOpacity>
         </View>
