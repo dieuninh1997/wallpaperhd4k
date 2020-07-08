@@ -74,6 +74,9 @@ const CategoryScreen = props => {
   };
 
   const handleSuggestionScreen = search => {
+    if (!search) {
+      return;
+    }
     navigate({routeName: screenNames.CollectionScreen, params: {search}});
   };
 

@@ -23,7 +23,7 @@ const {width} = Dimensions.get('window');
 
 const MainScreen = () => {
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
-  const [screenNavigate, setScreenNavigate] = useState('HomeScreen');
+  const [screenNavigate, setScreenNavigate] = useState('Trending');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [listImage, setListImage] = useState([]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -40,17 +40,25 @@ const MainScreen = () => {
     asyncLoadData();
   }, [getImages]);
 
+  useEffect(() => {
+    setNextPage(1);
+    setListImage([]);
+    getImages();
+  }, [getImages, screenNavigate]);
+
   const getImages = useCallback(async () => {
     setIsLoadingMore(true);
     try {
-      const response = await axios.get(
-        `/popular?per_page=80&page=${nextPage}`,
-        {
-          headers: {
-            Authorization: AppConfig.API_ACCESS_KEY,
-          },
+      let url = `/popular?per_page=80&page=${nextPage}`;
+      if (screenNavigate === 'Newest') {
+        url = `/curated?per_page=80&page=${nextPage}`;
+      }
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: AppConfig.API_ACCESS_KEY,
         },
-      );
+      });
+
       setListImage([...listImage, ...response.data.photos]);
       setPerPage(response.data.per_page);
       if (nextPage + 1 <= perPage) {
@@ -63,16 +71,21 @@ const MainScreen = () => {
       setIsLoadingMore(false);
       console.log('getImages.error', error);
     }
-  }, [listImage, nextPage, perPage]);
+  }, [listImage, nextPage, perPage, screenNavigate]);
 
   const handleRefreshData = async () => {
     setIsRefreshing(true);
     try {
-      const response = await axios.get('/popular?per_page=80&page=1', {
+      let url = '/popular?per_page=80&page=1';
+      if (screenNavigate === 'Newest') {
+        url = '/curated?per_page=80&page=1';
+      }
+      const response = await axios.get(url, {
         headers: {
           Authorization: AppConfig.API_ACCESS_KEY,
         },
       });
+
       setListImage(response.data.photos);
       setNextPage(1);
       setIsRefreshing(false);
@@ -107,7 +120,9 @@ const MainScreen = () => {
     </TouchableOpacity>
   );
 
-  const renderCenterHeader = () => <Text>Trending</Text>;
+  const renderCenterHeader = () => {
+    return <Text>{screenNavigate}</Text>;
+  };
 
   const renderRightHeader = () => (
     <TouchableOpacity
@@ -138,15 +153,15 @@ const MainScreen = () => {
   };
 
   const handleTrendingPressed = () => {
-    setScreenNavigate('HomeScreen');
+    setScreenNavigate('Trending');
   };
 
   const handleNewestPressed = () => {
-    setScreenNavigate('TrendingScreen');
+    setScreenNavigate('Newest');
   };
 
   const handleFavoritePressed = () => {
-    setScreenNavigate('FavoriteScreen');
+    navigate({routeName: screenNames.FavoriteScreen, params: {}});
   };
 
   const renderFooter = () => {
@@ -178,7 +193,7 @@ const MainScreen = () => {
             <Text
               style={[
                 styles.label,
-                screenNavigate === 'HomeScreen' ? styles.textBold : null,
+                screenNavigate === 'Trending' ? styles.textBold : null,
               ]}>
               Trending
             </Text>
@@ -188,7 +203,7 @@ const MainScreen = () => {
             <Text
               style={[
                 styles.label,
-                screenNavigate === 'TrendingScreen' ? styles.textBold : null,
+                screenNavigate === 'Newest' ? styles.textBold : null,
               ]}>
               Newest
             </Text>
@@ -198,7 +213,7 @@ const MainScreen = () => {
             <Text
               style={[
                 styles.label,
-                screenNavigate === 'FavoriteScreen' ? styles.textBold : null,
+                screenNavigate === 'Favorite' ? styles.textBold : null,
               ]}>
               Favorite
             </Text>

@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   btn: {
-    left: 16,
+    left: 1,
     position: 'absolute',
   },
 });

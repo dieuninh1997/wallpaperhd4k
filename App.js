@@ -23,6 +23,9 @@ const AppNavigator = createStackNavigator(
     CategoryScreen: {
       screen: screens.CategoryScreen,
     },
+    FavoriteScreen: {
+      screen: screens.FavoriteScreen,
+    }
   },
   {
     initialRouteName: 'SplashScreen',
