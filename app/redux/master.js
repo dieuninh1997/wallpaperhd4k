@@ -17,25 +17,25 @@ const initialState = {
     {
       search: 'blur',
       image:
-        'https://www.pexels.com/photo/selective-focus-photography-of-grey-wire-995043/',
+        'https://images.pexels.com/photos/3916456/pexels-photo-3916456.jpeg',
     },
     {
       search: 'design',
       image:
-        'https://www.pexels.com/photo/yellow-and-and-blue-colored-pencils-1762851/',
+        'https://images.pexels.com/photos/5836/yellow-metal-design-decoration.jpg',
     },
     {
       search: 'nature',
-      image:
-        'https://www.pexels.com/photo/bengal-tiger-half-soak-body-on-water-during-daytime-145939/',
+      image: 'https://images.pexels.com/photos/807598/pexels-photo-807598.jpeg',
     },
     {
       search: 'universe',
-      image: 'https://www.pexels.com/photo/sky-space-milky-way-stars-110854/',
+      image: 'https://images.pexels.com/photos/110854/pexels-photo-110854.jpeg',
     },
     {
       search: 'art',
-      image: 'https://www.pexels.com/photo/julius-caesar-marble-statue-615344/',
+      image:
+        'https://images.pexels.com/photos/161154/stained-glass-spiral-circle-pattern-161154.jpeg',
     },
   ],
 };
@@ -47,6 +47,12 @@ export default (state = initialState, action) => {
         ...state,
         favorites: action?.payload?.data,
       };
+    case SET_COLLECTIONS: {
+      return {
+        ...state,
+        collections: initialState.collections,
+      };
+    }
     default:
       return state;
   }

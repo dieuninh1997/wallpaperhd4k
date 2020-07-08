@@ -123,7 +123,7 @@ const MainScreen = () => {
   );
 
   const handleSearchPressed = () => {
-    navigate({routeName: screenNames.CollectionScreen, params: {}});
+    navigate({routeName: screenNames.CategoryScreen, params: {}});
   };
 
   const renderHeader = () => {

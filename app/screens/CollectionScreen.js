@@ -1,83 +1,134 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {
   View,
   FlatList,
   TouchableOpacity,
   Dimensions,
-  ImageBackground,
   StyleSheet,
-  TextInput,
+  ActivityIndicator,
   StatusBar,
 } from 'react-native';
-import {useSelector} from 'react-redux';
 import {useNavigation} from 'react-navigation-hooks';
 import {Text} from '../components';
 import {screenNames} from '../configs/const';
-import Fontisto from 'react-native-vector-icons/Fontisto';
+import axios from '../configs/axios';
+import AppConfig from '../utils/AppConfig';
+import FastImage from 'react-native-fast-image';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const {width, height} = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
-const CollectionScreen = () => {
-  const [searchText, setSearchText] = useState('');
-  const master = useSelector(state => state.master);
-  const {collections} = master;
+const CollectionScreen = props => {
+  const {search} = props?.navigation?.state?.params;
+  const {navigate} = useNavigation();
 
-  const handleSearchPressed = () => {};
-  const handleChangeInput = text => {
-    setSearchText(text);
+  const [listImage, setListImage] = useState([]);
+  const [nextPage, setNextPage] = useState(1);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  useEffect(() => {
+    const asyncLoadData = async () => {
+      await getImages();
+    };
+
+    asyncLoadData();
+  }, [getImages]);
+
+  const handleGoBack = () => {
+    props?.navigation.goBack();
   };
-  const renderHeader = () => {
-    console.log('================================================');
-    console.log('collections', collections);
-    console.log('================================================');
+
+  const getImages = useCallback(async () => {
+    setIsLoadingMore(true);
+    try {
+      const response = await axios.get(
+        `/search?query=${search}&per_page=80&page=${nextPage}`,
+        {
+          headers: {
+            Authorization: AppConfig.API_ACCESS_KEY,
+          },
+        },
+      );
+      setListImage([...listImage, ...response.data.photos]);
+      setNextPage(nextPage + 1);
+      setIsLoadingMore(false);
+    } catch (error) {
+      setIsLoadingMore(false);
+      console.log('getImages error', error);
+    }
+  }, [listImage, nextPage, search]);
+
+  const handleRefreshData = async () => {
+    setIsRefreshing(true);
+    try {
+      const response = await axios.get(
+        `/search?query=${search}&per_page=80&page=1`,
+        {
+          headers: {
+            Authorization: AppConfig.API_ACCESS_KEY,
+          },
+        },
+      );
+
+      setListImage(response.data.photos);
+      setNextPage(1);
+      setIsRefreshing(false);
+    } catch (error) {
+      setIsRefreshing(false);
+      console.log('handleRefreshData.error', error);
+    }
+  };
+
+  const handleGoImageDetailScreen = image => {
+    navigate({routeName: screenNames.ImageDetailScreen, params: {image}});
+  };
+
+  const renderFooter = () => {
+    if (!isLoadingMore) {
+      return null;
+    }
     return (
-      <View style={styles.searchContainer}>
-        <TextInput
-          allowFontScaling={false}
-          value={searchText}
-          style={styles.inputSearch}
-          underlineColorAndroid="transparent"
-          returnKeyType="done"
-          onChangeText={text => handleChangeInput(text)}
-          placeholder={'Search for free photos'}
-          placeholderTextColor={'#444774'}
-        />
-        <TouchableOpacity
-          hitSlop={{
-            top: 20,
-            bottom: 20,
-            left: 20,
-            right: 20,
-          }}
-          onPress={handleSearchPressed}>
-          <Fontisto size={20} color="#fff" name="search" />
-        </TouchableOpacity>
-      </View>
+      <ActivityIndicator style={{color: '#000', height: (50 / 375) * width}} />
     );
   };
 
-  const handleSuggestionScreen = search => {};
-  const renderItem = ({item}) => (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      onPress={() => handleSuggestionScreen(item?.search)}>
-      <ImageBackground style={styles.itemBg} source={{uri: item?.image}}>
-        <Text style={styles.itemName}>{item?.search}</Text>
-      </ImageBackground>
-    </TouchableOpacity>
-  );
-
   return (
     <View style={styles.container}>
-      <Text>{''}</Text>
-      {renderHeader()}
       <FlatList
-        data={collections}
-        extraData={collections}
-        keyExtractor={(item, index) => `FlatList-${index}`}
+        refreshing={isRefreshing}
+        onRefresh={handleRefreshData}
         showsVerticalScrollIndicator={false}
-        renderItem={renderItem}
+        data={listImage}
+        numColumns={3}
+        keyExtractor={(item, index) => `Image-${index}`}
+        extraData={listImage}
+        renderItem={({item, index}) => (
+          <TouchableOpacity
+            onPress={() => handleGoImageDetailScreen(item)}
+            style={{flex: 1}}
+            activeOpacity={0.9}>
+            <FastImage
+              source={{uri: item?.src?.portrait}}
+              resizeMode={FastImage.resizeMode.stretch}
+              style={{width: width / 3, height: (width / 3) * 1.5}}
+            />
+          </TouchableOpacity>
+        )}
+        onEndReachedThreshold={0.5}
+        onEndReached={getImages}
+        ListFooterComponent={renderFooter}
       />
+      <View style={styles.topView}>
+        <TouchableOpacity style={styles.btn} onPress={handleGoBack}>
+          <Icon
+            name="keyboard-backspace"
+            size={(26 / 375) * width}
+            color={'#fff'}
+          />
+        </TouchableOpacity>
+        <Text style={styles.title}>{search}</Text>
+      </View>
     </View>
   );
 };
@@ -89,33 +140,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#161952',
   },
-  searchContainer: {
-    marginHorizontal: 20,
-    height: 20 + StatusBar.currentHeight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff',
-    marginTop: StatusBar.currentHeight,
-    borderRadius: 5,
-    paddingHorizontal: 10,
+  topView: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: (50 / 375) * width + StatusBar.currentHeight,
     flexDirection: 'row',
-  },
-  inputSearch: {
-    flex: 1,
-    color: '#000',
-    fontSize: 14,
-    marginRight: 10,
-  },
-  itemBg: {
-    width,
-    height: (150 / 375) * width,
-    backgroundColor: '#000',
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(34, 40, 49, 0.4)',
   },
-  itemName: {
-    fontSize: 30,
+  title: {
+    fontSize: 24,
     textTransform: 'uppercase',
-    fontWeight: 'bold',
+    alignSelf: 'center',
+  },
+  btn: {
+    left: 16,
+    position: 'absolute',
   },
 });

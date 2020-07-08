@@ -1,11 +1,12 @@
 import {useEffect, useCallback} from 'react';
 import {useNavigation} from 'react-navigation-hooks';
 import {screenNames} from '../configs/const';
-import {dispatch} from 'rxjs/internal/observable/pairs';
+import {useDispatch} from 'react-redux';
 import {setCollections} from '../redux/master';
 
 const SplashScreen = () => {
   const {navigate} = useNavigation();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const loadData = () => {
@@ -19,7 +20,7 @@ const SplashScreen = () => {
       clearTimeout(timeout);
       loadData();
     };
-  }, [goMainScreen]);
+  }, [dispatch, goMainScreen]);
   const goMainScreen = useCallback(() => {
     navigate({routeName: screenNames.MainScreen, params: {}});
   }, [navigate]);
