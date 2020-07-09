@@ -154,10 +154,12 @@ const MainScreen = () => {
 
   const handleTrendingPressed = () => {
     setScreenNavigate('Trending');
+    handleCloseDrawer();
   };
 
   const handleNewestPressed = () => {
     setScreenNavigate('Newest');
+    handleCloseDrawer();
   };
 
   const handleFavoritePressed = () => {
