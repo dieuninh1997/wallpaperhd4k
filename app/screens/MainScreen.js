@@ -23,7 +23,7 @@ const {width} = Dimensions.get('window');
 
 const MainScreen = () => {
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
-  const [screenNavigate, setScreenNavigate] = useState('Trending');
+  const [screenNavigate, setScreenNavigate] = useState('Newest');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [listImage, setListImage] = useState([]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -40,11 +40,10 @@ const MainScreen = () => {
     asyncLoadData();
   }, [getImages]);
 
-  useEffect(() => {
-    setNextPage(1);
-    setListImage([]);
-    getImages();
-  }, [getImages, screenNavigate]);
+  // useEffect(() => {
+  //   setNextPage(1);
+  //   setListImage([]);
+  // }, [screenNavigate]);
 
   const getImages = useCallback(async () => {
     setIsLoadingMore(true);
@@ -152,17 +151,20 @@ const MainScreen = () => {
     );
   };
 
-  const handleTrendingPressed = () => {
-    setScreenNavigate('Trending');
-    handleCloseDrawer();
-  };
+  // const handleTrendingPressed = () => {
+  //   setScreenNavigate('Trending');
+  //   handleCloseDrawer();
+  //   getImages();
+  // };
 
   const handleNewestPressed = () => {
     setScreenNavigate('Newest');
     handleCloseDrawer();
+    getImages();
   };
 
   const handleFavoritePressed = () => {
+    handleCloseDrawer();
     navigate({routeName: screenNames.FavoriteScreen, params: {}});
   };
 
@@ -190,7 +192,7 @@ const MainScreen = () => {
             onPress={handleCloseDrawer}>
             <Icon size={30} color="#161952" name="format-line-weight" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.row} onPress={handleTrendingPressed}>
+          {/* <TouchableOpacity style={styles.row} onPress={handleTrendingPressed}>
             <Icon size={30} color="#161952" name="home" />
             <Text
               style={[
@@ -199,7 +201,7 @@ const MainScreen = () => {
               ]}>
               Trending
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity style={styles.row} onPress={handleNewestPressed}>
             <Icon size={30} color="#161952" name="trending-up" />
             <Text
