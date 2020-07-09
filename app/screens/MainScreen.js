@@ -5,6 +5,7 @@ import {
   FlatList,
   ActivityIndicator,
   Dimensions,
+  BackHandler,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
@@ -39,6 +40,20 @@ const MainScreen = () => {
     };
     asyncLoadData();
   }, [getImages]);
+
+  useEffect(() => {
+    const handler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleValidateClose,
+    );
+
+    return () => handler.remove();
+  }, [handleValidateClose]);
+
+  const handleValidateClose = useCallback(() => {
+    BackHandler.exitApp();
+    return true;
+  }, []);
 
   // useEffect(() => {
   //   setNextPage(1);
