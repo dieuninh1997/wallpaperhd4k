@@ -85,16 +85,26 @@ const ImageDetailScreen = props => {
       } catch (err) {
         //To handle permission related issue
         console.warn(err);
+        return false;
       }
     } else {
       return true;
     }
   };
-  const saveToGallery = imgUrl => {
+  const saveToGallery = async(imgUrl) => {
+    console.log('================================================');
+    console.log('imgUrl', imgUrl);
+    console.log('================================================');
     if (!imgUrl) {
       return;
     }
-    if (!checkPermission()) {
+
+    const check = await checkPermission();
+
+    console.log('================================================');
+    console.log('checkPermission', check);
+    console.log('================================================');
+    if (!check) {
       return;
     }
     const imageName = imgUrl.substring(
